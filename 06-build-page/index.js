@@ -1,6 +1,6 @@
 const fs = require('fs/promises');
 const path = require('path');
-
+const fsN = require ('fs');
 fs.mkdir(path.join(__dirname,'project-dist'), { recursive: true });
 const htmlBuilder =  async () => {
   await fs.writeFile(path.join(__dirname, 'project-dist', 'index.html'), '');
@@ -14,8 +14,20 @@ const htmlBuilder =  async () => {
   }  
 
   await fs.appendFile(path.join(__dirname, 'project-dist', 'index.html'), index);
-  console.log(index);
 };
 
 htmlBuilder();
 
+
+const sccBundle =  () => {
+  let bundle =  fsN.createWriteStream(path.join(__dirname, '/project-dist', 'style.css'));
+  fsN.readdir(path.join(__dirname, '/styles'), (err, files) => {
+    files.forEach(file => {
+      if(path.extname(file) === '.css'){
+        let writeableStream =  fsN.createReadStream(path.join(__dirname, '/styles', file)); 
+        writeableStream.pipe(bundle);
+      }
+    });
+  });
+};
+sccBundle();
